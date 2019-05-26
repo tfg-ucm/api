@@ -1,1 +1,2 @@
-# webapp
+# Sismotur REST server
+
