@@ -1,11 +1,12 @@
 const { Reward, validate } = require('../models/reward');
+const { sendPayment } = require('../helpers/stellar');
 
 exports.create = async function (req, res) {
     try {
-        const { error } = validate(req.body);
+        /* const { error } = validate(req.body);
         if (error) return res.status(400).send({
             error: error.details[0].message
-        });
+        }); */
 
         let reward = await Reward.findOne({ name: req.body.name });
         if (reward) return res.status(400).send({
@@ -13,8 +14,13 @@ exports.create = async function (req, res) {
         });
 
         reward = new Reward({
+            account_id: req.token.account_id,
             name: req.body.name,
-            account_id: req.token.account_id
+            ciudad: req.body.ciudad,
+            recompensa: req.body.recompensa,
+            beacons: req.body.beacons,
+            terminada: req.body.terminada,
+            canjeada: req.body.canjeada
         });
 
         await reward.save();
@@ -29,7 +35,9 @@ exports.create = async function (req, res) {
 
 exports.get = async function (req, res) {
     try {
-        let reward = await Reward.findById(req.params.id);
+        let reward = await Reward.find({
+            "account_id": "5ceebc41a8d26e34cad95cc1"
+        });
         if (!reward) return res.status(404).send({
             error: 'reward not exists'
         });
@@ -100,7 +108,57 @@ exports.delete = async function (req, res) {
 };
 
 exports.validate = async function (req, res) {
-    // Para validar una recompensa se verifica que el usuario
-    // ha pasado por todos los puntos que conforman la ruta
-    // que quiere validar.
+    try {
+        let reward = await Reward.findOne({
+            name: req.body.name
+        });
+        if (!reward) return res.status(404).send({
+            error: 'reward not exists'
+        });
+
+        reward.beacons.forEach(function (beacon) {
+            if (!beacon.validado) {
+                return res.status(400).send({
+                    error: 'all beacons must be validated',
+                    message: 'all beacons must be validated before validate a reward'
+                });
+            }
+        });
+
+        reward.terminada = true;
+        await reward.save();
+
+        sendPayment(reward.account_id, req.body.account_id, reward.recompensa);
+        return res.status(200).send(true);
+    } catch (e) {
+        return res.status(500).send({
+            error: 'error validating reward',
+            message: e.message
+        });
+    }
+};
+
+exports.claim = async function (req, res) {
+    try {
+        let reward = await Reward.findOne({
+            name: req.params.name
+        });
+        if (!reward) return res.status(404).send({
+            error: 'reward not exists'
+        });
+
+        let result = sendPayment(req.body.account_id, reward.account_id, reward.recompensa);
+        if (!result) return res.status(400).send({
+            error: 'error sending payment for claim reward',
+            message: 'error sending payment for claim reward'
+        });
+        return res.status(200).send({
+            message: 'reward claimed successfully'
+        });
+    } catch (e) {
+        return res.status(500).send({
+            error: 'error claiming reward',
+            message: e.message
+        });
+    }
 };

@@ -1,7 +1,7 @@
 const Joi = require('joi');
 const mongoose = require('mongoose');
 
-const Beacon = mongoose.model('Beacon', new mongoose.Schema({
+const Route = mongoose.model('Route', new mongoose.Schema({
     account_id: {
         type: String,
         minlegth: 24,
@@ -14,13 +14,11 @@ const Beacon = mongoose.model('Beacon', new mongoose.Schema({
         minlegth: 3,
         maxlength: 30
     },
-    longitud: {
-        type: Number,
-        required: true,
-    },
-    latitud: {
-        type: Number,
-        required: true,
+    descripcion: {
+        type: String,
+        required: false,
+        minlegth: 0,
+        maxlength: 50
     },
     ciudad: {
         type: String,
@@ -28,26 +26,29 @@ const Beacon = mongoose.model('Beacon', new mongoose.Schema({
         minlegth: 5,
         maxlength: 10
     },
-    ruta: {
-        type: String,
-        required: false,
-        minlegth: 0,
-        maxlength: 50
+    recompensa: {
+        type: Number,
+        required: true
+    },
+    puntos: {
+        type: Array,
+        required: true
     }
 }));
 
-function validate(beacon) {
+function validate(route) {
     const schema = {
         account_id: Joi.string().min(24).max(24),
         name: Joi.string().min(3).max(30).required(),
-        longitud: Joi.number().integer().required(),
-        latitud: Joi.number().integer().required(),
+        descripcion: Joi.string.max(50),
         ciudad: Joi.string().min(5).max(10).required(),
-        ruta: Joi.string().max(50)
+        recompensa: Joi.number().required(),
+        puntos: Joi.array().required
+        
     };
 
-    return Joi.validate(beacon, schema);
+    return Joi.validate(route, schema);
 }
 
-exports.Beacon = Beacon;
+exports.Route = Route;
 exports.validate = validate;

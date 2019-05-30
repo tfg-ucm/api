@@ -15,7 +15,7 @@ exports.create = async function (req, res) {
         rewardPoint = new RewardPoint({
             account_id: req.body.account_id,
             name: req.body.name,
-            description: req.body.description,
+            descripcion: req.body.descripcion,
             longitud: req.body.longitud,
             latitud: req.body.latitud,
             ciudad: req.body.ciudad
@@ -66,7 +66,7 @@ exports.getAll = async function (req, res) {
 exports.update = async function (req, res) {
     try {
         RewardPoint.findOneAndUpdate(
-            req.params.id,
+            {"_id": req.body.id},
             req.body,
             function(err, newRewardPoint) {
                 if (err) return res.status(500).send({
@@ -88,7 +88,7 @@ exports.update = async function (req, res) {
 
 exports.delete = async function (req, res) {
     try {
-        let deletedRewardPoint = await RewardPoint.findOneAndDelete(req.params.id);
+        let deletedRewardPoint = await RewardPoint.findOneAndDelete({"_id": req.body.id});
         if (deletedRewardPoint) return res.status(204).send({
             message: 'reward point deleted'
         });

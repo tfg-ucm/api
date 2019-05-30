@@ -1,11 +1,20 @@
 const StellarSdk = require('stellar-sdk');
 const fetch = require('node-fetch');
 const { Account } = require('../models/account');
+const StellarHelper = require('../helpers/stellar');
 
 const server = new StellarSdk.Server('https://horizon-testnet.stellar.org');
 
-exports.sendTransaction = function (req, res) {
-
+exports.sendTransaction = async function (req, res) {
+    let result = StellarHelper.sendPayment(req.body.source_account, req.body.target_account, req.params.recompensa);
+    if (!result) {
+        return res.status(400).json({
+            error: "error in payment"
+        });
+    }
+    return res.status(200).json({
+        message: "payment completed"
+    });
 };
 
 exports.getTransaction = function (req, res) {

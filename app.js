@@ -14,6 +14,7 @@ app.use('/api/v1/accounts', require('./routes/accounts'));
 app.use('/api/v1/beacons', require('./routes/beacons'));
 app.use('/api/v1/rewards', require('./routes/rewards'));
 app.use('/api/v1/reward-points', require('./routes/rewardPoints'));
+app.use('/api/v1/routes', require('./routes/routes'));
 app.use('/api/v1/stellar', require('./routes/stellar'));
 
 app.listen(port, () => console.log(`REST listening on port ${port}...`));

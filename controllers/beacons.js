@@ -1,5 +1,5 @@
 const { Beacon, validate } = require('../models/beacon');
-const { BeaconValidated } = require('../models/beaconValidated');
+const { Reward } = require('../models/reward');
 
 exports.create = async function (req, res) {
     try {
@@ -18,7 +18,8 @@ exports.create = async function (req, res) {
             name: req.body.name,
             longitud: req.body.longitud,
             latitud: req.body.latitud,
-            ciudad: req.body.ciudad
+            ciudad: req.body.ciudad,
+            ruta: req.body.ruta
         });
 
         await beacon.save();
@@ -49,7 +50,7 @@ exports.get = async function (req, res) {
 exports.getAll = async function (req, res) {
     try {
         let beacons = await Beacon.find({
-            account_id: req.token.account_id
+            //account_id: req.token.account_id
         });
         if (!beacons) return res.status(404).send({
             error: 'this account has no beacons'
@@ -63,13 +64,50 @@ exports.getAll = async function (req, res) {
     }
 };
 
+exports.getByCiudad = async function (req, res) {
+    try {
+        let beacons = await Beacon.find({
+            ciudad: req.params.ciudad
+        });
+        if (!beacons) return res.status(404).send({
+            error: 'no beacons found in this city'
+        });
+        return res.status(200).send(beacons);
+    } catch (e) {
+        return res.status(500).send({
+            error: 'error getting beacons',
+            message: e.message
+        });
+    }
+};
+
+exports.getByRuta = async function (req, res) {
+    try {
+        let beacons = await Beacon.find({
+            ruta: req.params.ruta
+        });
+        if (!beacons) return res.status(404).send({
+            error: 'no beacons found within this route'
+        });
+        return res.status(200).send(beacons);
+    } catch (e) {
+        return res.status(500).send({
+            error: 'error getting beacons',
+            message: e.message
+        });
+    }
+};
+
 exports.update = async function (req, res) {
     try {
         Beacon.findOneAndUpdate(
-            req.params.id,
+            {"_id": req.body.id},
             req.body,
             function(err, newBeacon) {
-                if (err) return res.status(500).send({ error: err });
+                if (err) return res.status(500).send({ 
+                    error: 'error updating beacon',
+                    message: err
+                 });
                 return res.status(200).send({
                     message: 'beacon updated'
                 });
@@ -85,7 +123,7 @@ exports.update = async function (req, res) {
 
 exports.delete = async function (req, res) {
     try {
-        let deletedBeacon = await Beacon.findOneAndDelete(req.params.token);
+        let deletedBeacon = await Beacon.findOneAndDelete({"_id": req.body.id});
         if (deletedBeacon) return res.status(204).send({
             message: 'beacon deleted'
         });
@@ -102,20 +140,18 @@ exports.delete = async function (req, res) {
 
 exports.validate = async function (req, res) {
     try {
-        let beaconValidated = await BeaconValidated.findOne({
-            account_id: req.body.account_id,
-            beacon: req.params.name
+        let reward = await Reward.findOne({
+            name: req.body.reward
         });
-        if (beaconValidated) return res.status(400).send({
-            error: 'beacon already validated'
-        });
+        if (!reward) return res.status(400).send({error: 'reward not exists'});
 
-        beaconValidated = new BeaconValidated({
-            account_id: req.body.account_id,
-            beacon: req.params.name
+        reward.beacons.forEach(function (beacon) {
+            if (beacon.name === req.body.beacon) {
+                beacon.validado = true;
+            }
         });
-        await beaconValidated.save();
-        res.status(200).send(beaconValidated);
+        await reward.save();
+        return res.status(200).send(reward);
     } catch (e) {
         return res.status(500).send({
             error: 'error validating beacon',

@@ -9,7 +9,7 @@ router.use(bodyParser.urlencoded({
 }));
 router.use(bodyParser.json());
 
-router.post('/', isAuthenticated, isAdmin, rewardPointsController.create);
+router.post('/', isAuthenticated, rewardPointsController.create);
 router.get('/:id', isAuthenticated, rewardPointsController.get);
 router.get('/', isAuthenticated, rewardPointsController.getAll);
 router.put('/:id', isAuthenticated, isAdmin, rewardPointsController.update);

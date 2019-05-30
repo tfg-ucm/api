@@ -70,7 +70,7 @@ exports.update = async function (req, res) {
 
 exports.delete = async function (req, res) {
     try {
-        let deletedAccount = await Account.findOneAndDelete(req.params.id);
+        let deletedAccount = await Account.findOneAndDelete({"_id": req.body.id});
         if (deletedAccount) return res.status(204).send({
             status: 'account deleted'
         });

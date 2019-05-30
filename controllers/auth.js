@@ -9,7 +9,12 @@ exports.login = async function (req, res) {
     if (!match) return res.status(401).send('Invalid login data');
 
     let token = generateToken({ account_id: account._id });
-    return res.status(200).send({ token: token });
+    return res.status(200).send({ 
+            token: token, 
+            id: account._id, 
+            role: account.userType 
+        }
+    );
 };
 
 exports.logout = function (req, res) {
