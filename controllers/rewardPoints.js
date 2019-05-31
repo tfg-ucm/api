@@ -63,6 +63,23 @@ exports.getAll = async function (req, res) {
     }
 };
 
+exports.getByCity = async function (req, res) {
+    try {
+        let rewardPoints = await RewardPoint.find({
+            ciudad: req.body.ciudad
+        });
+        if (!rewardPoints) return res.status(404).send({
+            error: 'this city has no reward points'
+        });
+        return res.status(200).send(rewardPoints);
+    } catch (e) {
+        return res.status(500).send({
+            error: 'error getting reward points of the city',
+            message: e.message
+        });
+    }
+};
+
 exports.update = async function (req, res) {
     try {
         RewardPoint.findOneAndUpdate(

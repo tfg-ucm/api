@@ -41,8 +41,8 @@ function validate(rewardPoint) {
         account_id: Joi.string().min(24).max(24).required(),
         name: Joi.string().min(3).max(30).required(),
         descripcion: Joi.string().max(300),
-        longitud: Joi.number().integer().required(),
-        latitud: Joi.number().integer().required(),
+        longitud: Joi.number().required(),
+        latitud: Joi.number().required(),
         ciudad: Joi.string().min(5).max(10).required()
     };
 

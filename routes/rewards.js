@@ -11,10 +11,11 @@ router.use(bodyParser.json());
 
 router.post('/', isAuthenticated, isAdmin, rewardsController.create);
 router.get('/:id', isAuthenticated, rewardsController.get);
+router.get('/hostelero/:id', isAuthenticated, rewardsController.getHostelero);
 router.get('/:id_user', isAuthenticated, rewardsController.getAll);
 router.put('/:id', isAuthenticated, isAdmin, rewardsController.update);
 router.delete('/:id', isAuthenticated, isAdmin, rewardsController.delete);
 router.post('/validate', isAuthenticated, rewardsController.validate);
-router.get('/claim/:name', isAuthenticated, rewardsController.claim);
+router.post('/claim/:name', isAuthenticated, rewardsController.claim);
 
 module.exports = router;

@@ -2,6 +2,7 @@ const Joi = require('joi');
 const mongoose = require('mongoose');
 
 let beaconSchema = new mongoose.Schema({name: String, validado: Boolean});
+let restauranteSchema = new mongoose.Schema({name: String, id: String});
 
 const Reward = mongoose.model('Reward', new mongoose.Schema({
     account_id: {
@@ -9,6 +10,12 @@ const Reward = mongoose.model('Reward', new mongoose.Schema({
         minlegth: 24,
         maxlength: 24,
         required: true
+    },
+    hostelero_id: {
+        type: String,
+        minlegth: 24,
+        maxlength: 24,
+        required: false
     },
     name: {
         type: String,
@@ -30,6 +37,10 @@ const Reward = mongoose.model('Reward', new mongoose.Schema({
         type: [beaconSchema],
         required: true
     },
+    puntosRecompensa: {
+        type: [restauranteSchema],
+        required: true
+    },
     terminada: {
         type: Boolean,
         required: true
@@ -43,6 +54,7 @@ const Reward = mongoose.model('Reward', new mongoose.Schema({
 function validate(reward) {
     const schema = {
         account_id: Joi.string().min(24).max(24),
+        hostelero_id: Joi.string().min(24).max(24),
         name: Joi.string().min(3).max(30).required(),
         ciudad: Joi.string().min(5).max(10).required(),
         recompensa: Joi.number().integer().required(),

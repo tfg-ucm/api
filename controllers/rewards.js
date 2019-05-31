@@ -15,10 +15,12 @@ exports.create = async function (req, res) {
 
         reward = new Reward({
             account_id: req.token.account_id,
+            hostelero_id: null,
             name: req.body.name,
             ciudad: req.body.ciudad,
             recompensa: req.body.recompensa,
             beacons: req.body.beacons,
+            puntosRecompensa: req.body.puntosRecompensa,
             terminada: req.body.terminada,
             canjeada: req.body.canjeada
         });
@@ -36,7 +38,24 @@ exports.create = async function (req, res) {
 exports.get = async function (req, res) {
     try {
         let reward = await Reward.find({
-            "account_id": "5ceebc41a8d26e34cad95cc1"
+            "account_id": req.params.id
+        });
+        if (!reward) return res.status(404).send({
+            error: 'reward not exists'
+        });
+        return res.status(200).send(reward);
+    } catch (e) {
+        return res.status(500).send({
+            error: 'error getting reward',
+            message: e.message
+        });
+    }
+};
+
+exports.getHostelero = async function (req, res) {
+    try {
+        let reward = await Reward.find({
+            "hostelero_id": req.params.id
         });
         if (!reward) return res.status(404).send({
             error: 'reward not exists'
@@ -147,11 +166,16 @@ exports.claim = async function (req, res) {
             error: 'reward not exists'
         });
 
-        let result = sendPayment(req.body.account_id, reward.account_id, reward.recompensa);
+        let result = sendPayment(reward.account_id, req.body.hostelero_id, reward.recompensa);
         if (!result) return res.status(400).send({
             error: 'error sending payment for claim reward',
             message: 'error sending payment for claim reward'
         });
+
+        reward.canjeada = true;
+        reward.hostelero_id = req.body.hostelero_id;
+        await reward.save();
+
         return res.status(200).send({
             message: 'reward claimed successfully'
         });
