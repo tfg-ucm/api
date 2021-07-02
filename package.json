@@ -13,6 +13,6 @@
         "jsonwebtoken": "^8.5.1",
         "mongoose": "^5.4.18",
         "node-fetch": "^2.3.0",
-        "stellar-sdk": "^0.15.0"
+        "stellar-sdk": "^8.2.3"
     }
 }
